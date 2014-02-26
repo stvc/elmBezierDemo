@@ -45,18 +45,31 @@ drawBezierCurve c =
 drawCurve : [MoveablePoint] -> [Form]
 drawCurve ps = drawControlLines ps :: drawBezierCurve ps :: drawControlPoints ps
 
--- updates whether or not any MoveablePoints are currently selected based on
--- mouse clicks and releases
+-- updates MoveablePoints' selected property based on mouse clicks and releases
 updatePointStatus : (Bool, (Float, Float)) -> [MoveablePoint] -> [MoveablePoint]
 updatePointStatus (pressed, (x,y)) ps =
     case pressed of
-        False   -> map (\ p -> {p | selected <- False } ) ps
-        True    -> map (\ p -> if ((fst p.pos - 5) < x && (fst p.pos + 5) > x && (snd p.pos - 5) < y && (snd p.pos + 5) > y)
-                                    then {p | selected <- True}
-                                    else p
-                       ) ps
+        False   ->  map (\ p -> {p | selected <- False } ) ps
+        True    ->  let pointIsSelected points = case points of
+                            [] -> False
+                            (point::rest) -> if point.selected then True else pointIsSelected rest
+                    in if pointIsSelected ps then ps else  updatePointStatus' (x,y) ps
 
--- custom signals
+updatePointStatus' : (Float, Float) -> [MoveablePoint] -> [MoveablePoint]
+updatePointStatus' (x,y) points =
+    case points of
+        [] -> []
+        (p::ps) ->  if (   (fst p.pos - 5) < x
+                        && (fst p.pos + 5) > x
+                        && (snd p.pos - 5) < y
+                        && (snd p.pos + 5) > y
+                       )
+                    then {p | selected <- True} :: ps
+                    else p :: (updatePointStatus' (x,y) ps)
+
+{-
+Custom Signals
+-}
 dragSignal = keepWhen Mouse.isDown (0,0) mousePosition  -- should only update when mouse button is down
 mouseBtnToggle = dropRepeats Mouse.isDown               -- should only update when mouse button changes state
 mousePosition = lift2 (\(mx,my) (w,h) ->                -- convert mouse coordinates to canvas coordinates
