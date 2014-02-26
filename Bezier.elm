@@ -45,14 +45,6 @@ drawBezierCurve c =
 drawCurve : [MoveablePoint] -> [Form]
 drawCurve ps = drawControlLines ps :: drawBezierCurve ps :: drawControlPoints ps
 
--- a simple starter curve
-curve1 : Curve
-curve1 = [ makeMoveablePoint (-200, -150)
-         , makeMoveablePoint (-100,    0)
-         , makeMoveablePoint ( 100,    0)
-         , makeMoveablePoint ( 200, -150)
-         ]
-
 -- updates whether or not any MoveablePoints are currently selected based on
 -- mouse clicks and releases
 updatePointStatus : (Bool, (Float, Float)) -> [MoveablePoint] -> [MoveablePoint]
@@ -81,6 +73,14 @@ updatePointPosition (mx, my) ps =
             False -> p
             True  -> {p | pos <- (mx,my)}
     in map updatePointPosition' ps
+
+-- a simple starter curve
+curve1 : Curve
+curve1 = [ makeMoveablePoint (-200, -150)
+         , makeMoveablePoint (-100,    0)
+         , makeMoveablePoint ( 100,    0)
+         , makeMoveablePoint ( 200, -150)
+         ]
 
 -- bring it all together
 update (sigA, sigB) = updatePointPosition sigA . updatePointStatus sigB
