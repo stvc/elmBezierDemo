@@ -89,14 +89,14 @@ updatePointPosition (mx, my) ps =
 
 -- a simple starter curve
 curve1 : Curve
-curve1 = [ makeMoveablePoint (-200, -150)
-         , makeMoveablePoint (-100,    0)
-         , makeMoveablePoint ( 100,    0)
-         , makeMoveablePoint ( 200, -150)
+curve1 = [ makeMoveablePoint (-200,  -50)
+         , makeMoveablePoint (-100,  150)
+         , makeMoveablePoint ( 100, -150)
+         , makeMoveablePoint ( 200,   50)
          ]
 
 -- bring it all together
-update (sigA, sigB) = updatePointPosition sigA . updatePointStatus sigB
+update (sigA, sigB) = updatePointStatus sigB . updatePointPosition sigA
 updatedPoints = foldp update curve1 (lift2 (,) dragSignal (lift2 (,) mouseBtnToggle (sampleOn mouseBtnToggle mousePosition)))
 
 render (w,h) ps = collage w h <| drawCurve ps
